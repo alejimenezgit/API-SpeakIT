@@ -5,7 +5,8 @@
 	"scripts": {
 		"start": "node ./bin/www",
 		"start-dev": "nodemon ./bin/www",
-		"insertUser": "node ./bin/seedsUser"
+		"insertUser": "node ./bin/seedsUser",
+		"insertLanguage": "node ./bin/seedsLanguage"
 	},
 	"dependencies": {
 		"cookie-parser": "~1.4.4",
