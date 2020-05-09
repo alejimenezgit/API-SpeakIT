@@ -22,7 +22,10 @@ mongoose
 		console.error(error);
 	});
 
-const indexRouter = require('./routes/index');
+const userRouter = require('./routes/user');
+const languageRouter = require('./routes/language');
+const languageUserRouter = require('./routes/languageUser');
+const comunicationRouter = require('./routes/comunication');
 
 const app = express();
 
@@ -33,7 +36,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+app.use('/user', userRouter);
+app.use('/language', languageRouter);
+app.use('/languageUser', languageUserRouter);
+app.use('/comunication', comunicationRouter);
+
 
 app.use((req, res, next) => {
 	next(createError(404));

@@ -6,7 +6,9 @@
 		"start": "node ./bin/www",
 		"start-dev": "nodemon ./bin/www",
 		"insertUser": "node ./bin/seedsUser",
-		"insertLanguage": "node ./bin/seedsLanguage"
+		"insertLanguage": "node ./bin/seedsLanguage",
+		"insertLanguageUser": "node ./bin/seedsLanguageUser",
+		"insertComunication": "node ./bin/seedsComunication"
 	},
 	"dependencies": {
 		"cookie-parser": "~1.4.4",
