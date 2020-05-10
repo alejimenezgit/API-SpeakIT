@@ -1,32 +1,13 @@
-const express = require('express');
-const router  = express.Router();
-const Language   = require('../models/Language');
-
-
-/*
-	path:    /language/
-	dscrip:  get an language
-	body:    language
-*/
-router.post('/:id',  async (req, res, next) => {
-	//const { id } = req.body;
-	try{
-		const language = await Language.findOne({ id });
-		if (language) {
-			return res.json(uselanguager);
-		}
-		return res.status(404).json({ code: 'not-found' });
-	} catch(error) {
-		next(error);
-	}
-});
+const express  = require('express');
+const router   = express.Router();
+const Language = require('../models/Language');
 
 
 /*
 	path:    /language/all
 	dscrip:  get all the language
 */
-router.get('/all',  async (req, res, next) => {
+router.get('/all', async (req, res, next) => {
 	try{
 		const languages = await Language.find();
 		if (languages) {
@@ -37,7 +18,6 @@ router.get('/all',  async (req, res, next) => {
 		next(error);
 	}
 });
-
 
 /*
 	path:    /language/add
@@ -63,12 +43,10 @@ router.post('/add',  async (req, res, next) => {
 	body:    all params (body)
 */
 router.put('/update/:id', async (req, res, next) => {
-	const { language } = req.body;
-	const conditions = { language: language};
-
+	const { id } = req.params;
 	try{
-		const user = await Users.update(conditions,req.body);
-		if (user) {
+		const language = await Language.findByIdAndUpdate(id,req.body);
+		if (language) {
 			/*const userUpdated = await Users.findOne({ email })*/
 			return res.json("done");
 		}
@@ -79,15 +57,14 @@ router.put('/update/:id', async (req, res, next) => {
 });
 
 /*
-	path:    /user/delete
-	dscrip:  delete an user
+	path:    /language/delete
+	dscrip:  delete an language
 	body:    all params (body)
 */
 router.delete('/delete/:id', async (req, res, next) => {
-	const conditions = { email: req.body.email};
 	try{
-		const user = await Users.deleteOne(conditions);
-		if (user) {
+		const language = await Language.findByIdAndRemove(req.params.id);
+		if (language) {
 			return res.json("done");
 		}
 		return res.status(404).json({ code: 'not-found' });
@@ -95,5 +72,24 @@ router.delete('/delete/:id', async (req, res, next) => {
 		next(error);
 	}
 });
+
+/*
+	path:    /language/
+	dscrip:  get an language
+	body:    language
+*/
+router.get('/:id', async (req, res, next) => {
+	const { id } = req.params;
+	try{
+		const language = await Language.findById(id);
+		if (language) {
+			return res.json(language);
+		}
+		return res.status(404).json({ code: 'not-found' });
+	} catch(error) {
+		next(error);
+	}
+});
+
 
 module.exports = router;
