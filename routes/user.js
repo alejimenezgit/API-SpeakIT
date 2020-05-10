@@ -1,24 +1,9 @@
 const express = require('express');
 const router  = express.Router();
+const bcrypt = require('bcryptjs');
 const Users   = require('../models/User');
 
-/*
-	path:    /user/
-	dscrip:  get an user
-	body:    email
-*/
-router.post('/',  async (req, res, next) => {
-	const { email } = req.body;
-	try{
-		const user = await Users.findOne({ email });
-		if (user) {
-			return res.json(user);
-		}
-		return res.status(404).json({ code: 'not-found' });
-	} catch(error) {
-		next(error);
-	}
-});
+const bcryptSalt = 10;
 
 /*
 	path:    /user/random
@@ -60,10 +45,20 @@ router.get('/all',  async (req, res, next) => {
 	body:    all params (body)
 */
 router.post('/add',  async (req, res, next) => {
-	const user = new Users(req.body);
+	const { password, email } = req.body;
+	console.log(password);
+	const newUser = new Users(req.body);
 	try{
-		await user.save();
+		const user = await Users.findOne({ email });
 		if (user) {
+			return res.status(422).json({ code: 'username-not-unique' });
+		}
+
+		const salt = bcrypt.genSaltSync(bcryptSalt);
+		newUser.password = bcrypt.hashSync(password, salt);
+
+		await newUser.save();
+		if (newUser) {
 			return res.json("done");
 		}
 		return res.status(404).json({ code: 'not-found' });
@@ -77,12 +72,10 @@ router.post('/add',  async (req, res, next) => {
 	dscrip:  update an user
 	body:    all params (body)
 */
-router.put('/update', async (req, res, next) => {
-	const { email } = req.body;
-	const conditions = { email: email};
-
+router.put('/update/:id', async (req, res, next) => {
+	const { id } = req.params;
 	try{
-		const user = await Users.update(conditions,req.body);
+		const user = await Users.findByIdAndUpdate(id,req.body);
 		if (user) {
 			/*const userUpdated = await Users.findOne({ email })*/
 			return res.json("done");
@@ -98,10 +91,10 @@ router.put('/update', async (req, res, next) => {
 	dscrip:  delete an user
 	body:    all params (body)
 */
-router.delete('/delete', async (req, res, next) => {
-	const conditions = { email: req.body.email};
+router.delete('/delete/:id', async (req, res, next) => {
+	console.log(req.params.id)
 	try{
-		const user = await Users.deleteOne(conditions);
+		const user = await Users.findByIdAndRemove(req.params.id);
 		if (user) {
 			return res.json("done");
 		}
@@ -110,5 +103,26 @@ router.delete('/delete', async (req, res, next) => {
 		next(error);
 	}
 });
+
+/*
+	path:    /user/
+	dscrip:  get an user
+	body:    email, password
+*/
+router.post('/',  async (req, res, next) => {
+	const { email,password } = req.body;
+	try{
+		const user = await Users.findOne({ email });
+		
+		if(user) {return res.json(user); }
+		if (user && bcrypt.compareSync(password, user.password)) {
+				return res.json(user);
+		}
+		return res.status(404).json({ code: 'not-found' });
+	} catch(error) {
+		next(error);
+	}
+});
+
 
 module.exports = router;
