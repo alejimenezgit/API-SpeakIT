@@ -2,7 +2,6 @@ const express  = require('express');
 const router   = express.Router();
 const Language = require('../models/Language');
 
-
 /*
 	path:    /language/all
 	dscrip:  get all the language

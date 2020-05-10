@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const comunicationSchema = new Schema({
-    language:  {type: String, required: true, unique: true},
+    language:  {type: String, required: true},
     user:      {type: Array,  required: true}
 });
 

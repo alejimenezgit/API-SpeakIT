@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const languageUserSchema = new Schema({
-    language:  {type: String, required: true, unique: true},
+    language:  {type: String, required: true},
     level:     {type: Number, required: true}
 });
 
