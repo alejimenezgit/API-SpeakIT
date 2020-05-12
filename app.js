@@ -4,7 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
-//const cors = require('cors');
+const cors = require('cors');
 require('dotenv').config();
 
 const dbPath = process.env.MONGODB_URI;
@@ -29,7 +29,11 @@ const comunicationRouter = require('./routes/comunication');
 
 const app = express();
 
-//app.use(cors());
+app.use(cors( {
+	credentials: true,
+}
+	
+));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
