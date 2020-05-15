@@ -5,6 +5,15 @@ const Users   = require('../models/User');
 
 const bcryptSalt = 10;
 
+
+router.get('/whouseris', (req, res, next) => {
+	if (req.session.currentUser) {
+		res.status(200).json(req.session.currentUser);
+	} else {
+		res.status(401).json({ code: 'unauthorized' });
+	}
+});
+
 /*
 	path:    /user/random
 	dscrip:  get a random user
