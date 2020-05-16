@@ -2,11 +2,14 @@ const express = require('express');
 const router  = express.Router();
 const bcrypt = require('bcryptjs');
 const Users   = require('../models/User');
-
+const { checkUserEmpty, checkIfLoggedIn } = require('../middlewares');
 const bcryptSalt = 10;
+
+/* router.use(checkIfLoggedIn); */
 
 
 router.get('/whouseris', (req, res, next) => {
+	console.log(req);
 	if (req.session.currentUser) {
 		res.status(200).json(req.session.currentUser);
 	} else {
@@ -36,7 +39,8 @@ router.get('/random',  async (req, res, next) => {
 	path:    /user/all
 	dscrip:  get an user
 */
-router.get('/all',  async (req, res, next) => {
+
+router.get('/all', checkIfLoggedIn,  async (req, res, next) => {
 	try{
 		const user = await Users.find();
 		if (user) {
@@ -53,9 +57,9 @@ router.get('/all',  async (req, res, next) => {
 	dscrip:  add an user
 	body:    all params (body)
 */
-router.post('/add',  async (req, res, next) => {
-	const { password, email } = req.body;
-	console.log(password);
+router.post('/add', async (req, res, next) => {
+	const { name, surnames, email, password } = req.body;
+	console.log({ name, surnames, email, password });
 	const newUser = new Users(req.body);
 	try{
 		const user = await Users.findOne({ email });
@@ -65,10 +69,11 @@ router.post('/add',  async (req, res, next) => {
 
 		const salt = bcrypt.genSaltSync(bcryptSalt);
 		newUser.password = bcrypt.hashSync(password, salt);
-
 		await newUser.save();
 		if (newUser) {
-			return res.json("done");
+			req.session.currentUser = newUser;
+			const userRegistered = await Users.findOne({ email });
+			return res.json(userRegistered);
 		}
 		return res.status(404).json({ code: 'not-found' });
 	} catch(error) {
@@ -118,13 +123,12 @@ router.delete('/delete/:id', async (req, res, next) => {
 	dscrip:  get an user
 	body:    email, password
 */
-router.post('/',  async (req, res, next) => {
-	const { email,password } = req.body;
+router.post('/', checkUserEmpty, async (req, res, next) => {
+	const { email,password } = res.locals.auth;
 	try{
 		const user = await Users.findOne({ email });
-		
-		if(user) {return res.json(user); }
 		if (user && bcrypt.compareSync(password, user.password)) {
+				req.session.currentUser = user;
 				return res.json(user);
 		}
 		return res.status(404).json({ code: 'not-found' });
@@ -132,6 +136,5 @@ router.post('/',  async (req, res, next) => {
 		next(error);
 	}
 });
-
 
 module.exports = router;
