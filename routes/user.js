@@ -5,11 +5,24 @@ const Users   = require('../models/User');
 const { checkUserEmpty, checkIfLoggedIn } = require('../middlewares');
 const bcryptSalt = 10;
 
-/* router.use(checkIfLoggedIn); */
+/*
+	path:    /user/logout
+	dscrip:  disconnect the user session
+*/
+router.get('/logout', (req, res, next) => {
+	req.session.destroy(err => {
+		if (err) {
+			next(err);
+		}
+		return res.status(204).send();
+	});
+});
 
-
+/*
+	path:    /user/whouseris
+	dscrip:  if user is connected
+*/
 router.get('/whouseris', (req, res, next) => {
-	console.log(req);
 	if (req.session.currentUser) {
 		res.status(200).json(req.session.currentUser);
 	} else {
