@@ -26,9 +26,9 @@ router.get('/logout', (req, res, next) => {
 */
 router.get('/whouseris', (req, res, next) => {
 	if (req.session.currentUser) {
+		const { _id, name, surnames, email, nativeLanguages, comunications } = req.session.currentUser;
 		console.log(req.session.currentUser)
-		const { _id, name, surnames, email, nativeLanguages, comunitacions } = req.session.currentUser;
-		res.status(200).json({ _id, name, surnames, email, nativeLanguages, comunitacions } );
+		res.status(200).json({ _id, name, surnames, email, nativeLanguages, comunications } );
 	} else {
 		res.status(401).json({ code: 'unauthorized' });
 	}
@@ -43,7 +43,6 @@ router.get('/random',  async (req, res, next) => {
 		const users = await Users.find();
 		if (users) {
 			const rndnum = Math.floor(Math.random() * users.length) 
-			console.log(rndnum); 
 			return res.json(users[rndnum]);
 		}
 		return res.status(404).json({ code: 'not-found' });
@@ -76,7 +75,6 @@ router.get('/all',  async (req, res, next) => {
 */
 router.post('/add', async (req, res, next) => {
 	const { name, surnames, email, password, nativeLanguages, comunications } = req.body;
-	console.log({ name, surnames, email, password, nativeLanguages, comunications })
 	const newUser = new Users(req.body);
 	try{
 		const user = await Users.findOne({ email });
@@ -123,7 +121,6 @@ router.put('/update/:id', async (req, res, next) => {
 	body:    all params (body)
 */
 router.delete('/delete/:id', async (req, res, next) => {
-	console.log(req.params.id)
 	try{
 		const user = await Users.findByIdAndRemove(req.params.id);
 		if (user) {
@@ -164,7 +161,7 @@ router.post('/', checkUserEmpty, async (req, res, next) => {
 	try{
 		const user = await Users.findOne({ email });
 		if (user && bcrypt.compareSync(password, user.password)) {
-				req.session.currentUser = user._id;
+				req.session.currentUser = user;
 				return res.json(user);
 		}
 		return res.status(404).json({ code: 'not-found' });

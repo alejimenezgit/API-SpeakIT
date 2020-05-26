@@ -1,6 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const Comunication   = require('../models/Comunication');
+const Users   = require('../models/User');
 
 /*
 	path:    /comunication/all
@@ -29,6 +30,26 @@ router.post('/add',  async (req, res, next) => {
 		const savedComunitation = await comunication.save();
 		if (savedComunitation) {
 			return res.json(savedComunitation);
+		}
+		return res.status(404).json({ code: 'not-found' });
+	} catch(error) {
+		next(error);
+	}
+});
+
+/*
+	path:    /comunication/allByIds
+	dscrip:  get all Comunications by User
+	body:    all params (body)
+*/
+router.get('/allByIds/:id', async (req, res, next) => {
+	try{
+		const i = await Users.findById(req.params.id);
+		console.log(i);
+		
+		const comunication = await Users.findById(req.params.id).populate('comunications').exec((err,posts) => {console.log(posts)})
+		if (comunication) {
+			return res.json(comunication);
 		}
 		return res.status(404).json({ code: 'not-found' });
 	} catch(error) {
