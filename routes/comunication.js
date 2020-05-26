@@ -26,9 +26,9 @@ router.get('/all', async (req, res, next) => {
 router.post('/add',  async (req, res, next) => {
 	const comunication = new Comunication(req.body);
 	try{
-		await comunication.save();
-		if (comunication) {
-			return res.json("done");
+		const savedComunitation = await comunication.save();
+		if (savedComunitation) {
+			return res.json(savedComunitation);
 		}
 		return res.status(404).json({ code: 'not-found' });
 	} catch(error) {

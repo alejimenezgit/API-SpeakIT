@@ -5,6 +5,8 @@ const Users   = require('../models/User');
 const { checkUserEmpty, checkIfLoggedIn } = require('../middlewares');
 const bcryptSalt = 10;
 
+// checkIfLoggedIn
+
 /*
 	path:    /user/logout
 	dscrip:  disconnect the user session
@@ -23,9 +25,10 @@ router.get('/logout', (req, res, next) => {
 	dscrip:  if user is connected
 */
 router.get('/whouseris', (req, res, next) => {
-	const { _id } = req.session.currentUser;
 	if (req.session.currentUser) {
-		res.status(200).json({ _id });
+		console.log(req.session.currentUser)
+		const { _id, name, surnames, email, nativeLanguages, comunitacions } = req.session.currentUser;
+		res.status(200).json({ _id, name, surnames, email, nativeLanguages, comunitacions } );
 	} else {
 		res.status(401).json({ code: 'unauthorized' });
 	}
@@ -54,7 +57,7 @@ router.get('/random',  async (req, res, next) => {
 	dscrip:  get an user
 */
 
-router.get('/all', checkIfLoggedIn,  async (req, res, next) => {
+router.get('/all',  async (req, res, next) => {
 	try{
 		const user = await Users.find();
 		if (user) {
