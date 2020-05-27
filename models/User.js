@@ -7,7 +7,7 @@ const userSchema = new Schema({
     email:              {type: String, required: true, unique: true},
     password:           {type: String, required: true},
     nativeLanguages:    {type: Array},
-    comunications:      [{type: Array, ref: 'comunications'}]
+    comunications:      [{type: mongoose.Schema.Types.ObjectId, ref: 'Comunication'}]
 });
 
 const User = mongoose.model('User', userSchema);

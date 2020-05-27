@@ -44,12 +44,12 @@ router.post('/add',  async (req, res, next) => {
 */
 router.get('/allByIds/:id', async (req, res, next) => {
 	try{
-		const i = await Users.findById(req.params.id);
-		console.log(i);
-		
-		const comunication = await Users.findById(req.params.id).populate('comunications').exec((err,posts) => {console.log(posts)})
+		const comunication = await Users.findById(req.params.id).populate('comunications');
 		if (comunication) {
-			return res.json(comunication);
+			var languages = comunication.comunications.map((comunication, index) => {
+				return comunication.language;
+			})
+			return res.json(languages);
 		}
 		return res.status(404).json({ code: 'not-found' });
 	} catch(error) {

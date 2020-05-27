@@ -56,6 +56,24 @@ router.get('/random',  async (req, res, next) => {
 	dscrip:  get an user
 */
 
+router.get('/allbyLanguage',  async (req, res, next) => {
+	console.log(req.body)
+	try{
+		const user = await Users.find({nativeLanguages: req.body.nativeLanguages});
+		if (user) {
+			return res.json(user);
+		}
+		return res.status(404).json({ code: 'not-found' });
+	} catch(error) {
+		next(error);
+	}
+});
+
+/*
+	path:    /user/all
+	dscrip:  get an user
+*/
+
 router.get('/all',  async (req, res, next) => {
 	try{
 		const user = await Users.find();
@@ -67,6 +85,9 @@ router.get('/all',  async (req, res, next) => {
 		next(error);
 	}
 });
+
+
+
 
 /*
 	path:    /user/add
