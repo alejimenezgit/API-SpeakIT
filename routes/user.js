@@ -119,6 +119,42 @@ router.post('/add', async (req, res, next) => {
 });
 
 /*
+	path:    /user/pushMash
+	dscrip:  update an user
+	body:    all params (body)
+*/
+router.put('/pushMatch/:id', async (req, res, next) => {
+	const { id } = req.params;
+	try{
+		const user = await Users.findByIdAndUpdate(id,{$push: {match: req.body}});
+		if (user) {
+			return res.json("done");
+		}
+		return res.status(404).json({ code: 'not-found' });
+	} catch(error) {
+		next(error);
+	}
+});
+
+/*
+	path:    /user/pushComunication
+	dscrip:  update an user
+	body:    all params (body)
+*/
+router.put('/pushComunication/:id', async (req, res, next) => {
+	const { id } = req.params;
+	try{
+		const user = await Users.findByIdAndUpdate(id,{$push: {comunications: req.body}});
+		if (user) {
+			return res.json("done");
+		}
+		return res.status(404).json({ code: 'not-found' });
+	} catch(error) {
+		next(error);
+	}
+});
+
+/*
 	path:    /user/update
 	dscrip:  update an user
 	body:    all params (body)
@@ -128,7 +164,6 @@ router.put('/update/:id', async (req, res, next) => {
 	try{
 		const user = await Users.findByIdAndUpdate(id,req.body);
 		if (user) {
-			/*const userUpdated = await Users.findOne({ email })*/
 			return res.json("done");
 		}
 		return res.status(404).json({ code: 'not-found' });
@@ -147,6 +182,25 @@ router.delete('/delete/:id', async (req, res, next) => {
 		const user = await Users.findByIdAndRemove(req.params.id);
 		if (user) {
 			return res.json("done");
+		}
+		return res.status(404).json({ code: 'not-found' });
+	} catch(error) {
+		next(error);
+	}
+});
+
+/*
+	path:    /user/
+	dscrip:  get an user
+	body:    email, password
+*/
+router.get('/oneUserMatches/:id', async (req, res, next) => {
+	const { id } = req.params;
+	try{
+		const user = await Users.findById(id);
+		if (user) {
+			const { match } = user
+			return res.json( { match } );
 		}
 		return res.status(404).json({ code: 'not-found' });
 	} catch(error) {
