@@ -26,9 +26,9 @@ router.get('/logout', (req, res, next) => {
 */
 router.get('/whouseris', (req, res, next) => {
 	if (req.session.currentUser) {
-		const { _id, name, surnames, email, nativeLanguages, comunications } = req.session.currentUser;
+		const { _id, name, surnames, email, nativeLanguages, comunications, match } = req.session.currentUser;
 		console.log(req.session.currentUser)
-		res.status(200).json({ _id, name, surnames, email, nativeLanguages, comunications } );
+		res.status(200).json({ _id, name, surnames, email, nativeLanguages, comunications, match } );
 	} else {
 		res.status(401).json({ code: 'unauthorized' });
 	}
@@ -56,10 +56,11 @@ router.get('/random',  async (req, res, next) => {
 	dscrip:  get an user
 */
 
-router.get('/allbyLanguage',  async (req, res, next) => {
+router.post('/allbyLanguage',  async (req, res, next) => {
 	console.log(req.body)
 	try{
 		const user = await Users.find({nativeLanguages: req.body.nativeLanguages});
+		//console.log(user)
 		if (user) {
 			return res.json(user);
 		}
@@ -95,7 +96,7 @@ router.get('/all',  async (req, res, next) => {
 	body:    all params (body)
 */
 router.post('/add', async (req, res, next) => {
-	const { name, surnames, email, password, nativeLanguages, comunications } = req.body;
+	const { name, surnames, email, password, nativeLanguages, comunications, match } = req.body;
 	const newUser = new Users(req.body);
 	try{
 		const user = await Users.findOne({ email });
@@ -163,8 +164,8 @@ router.get('/:id', async (req, res, next) => {
 	try{
 		const user = await Users.findById(id);
 		if (user) {
-			const { _id, name, surnames, email, nativeLanguages, comunications } = user
-			return res.json( {_id, name, surnames, email, nativeLanguages, comunications } );
+			const { _id, name, surnames, email, nativeLanguages, comunications, match } = user
+			return res.json( {_id, name, surnames, email, nativeLanguages, comunications, match } );
 		}
 		return res.status(404).json({ code: 'not-found' });
 	} catch(error) {
