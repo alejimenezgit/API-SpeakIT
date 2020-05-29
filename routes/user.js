@@ -1,7 +1,9 @@
 const express = require('express');
 const router  = express.Router();
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Users   = require('../models/User');
+const Comunication   = require('../models/Comunication');
 const { checkUserEmpty, checkIfLoggedIn } = require('../middlewares');
 const bcryptSalt = 10;
 
@@ -26,9 +28,9 @@ router.get('/logout', (req, res, next) => {
 */
 router.get('/whouseris', (req, res, next) => {
 	if (req.session.currentUser) {
-		const { _id, name, surnames, email, nativeLanguages, comunications, match } = req.session.currentUser;
+		const { _id, name, surnames, email, nativeLanguages, comunications } = req.session.currentUser;
 		console.log(req.session.currentUser)
-		res.status(200).json({ _id, name, surnames, email, nativeLanguages, comunications, match } );
+		res.status(200).json({ _id, name, surnames, email, nativeLanguages, comunications } );
 	} else {
 		res.status(401).json({ code: 'unauthorized' });
 	}
@@ -96,7 +98,7 @@ router.get('/all',  async (req, res, next) => {
 	body:    all params (body)
 */
 router.post('/add', async (req, res, next) => {
-	const { name, surnames, email, password, nativeLanguages, comunications, match } = req.body;
+	const { name, surnames, email, password, nativeLanguages, comunications } = req.body;
 	const newUser = new Users(req.body);
 	try{
 		const user = await Users.findOne({ email });
@@ -135,7 +137,7 @@ router.put('/pushMatch/:id', async (req, res, next) => {
 		next(error);
 	}
 });
-
+ 
 /*
 	path:    /user/pushComunication
 	dscrip:  update an user
@@ -173,6 +175,29 @@ router.put('/update/:id', async (req, res, next) => {
 });
 
 /*
+	path:    /user/createMatch
+	dscrip:  update an user
+	body:    all params (body)
+*/
+router.post('/createMatch', async (req, res, next) => {
+	const comunication = new Comunication(req.body);
+	try{
+		const savedComunitation = await comunication.save();
+		if (savedComunitation) {
+			const firstUser = await Users.findByIdAndUpdate(comunication.sender,{$push: {comunications: comunication._id}} );
+			const secondUser = await Users.findByIdAndUpdate(comunication.receiver,{$push: {comunications: comunication._id} });
+			if (firstUser && secondUser) 
+				return res.json("done");
+		}
+			return res.status(404).json({ code: 'not-found' });
+	} catch(error) {
+		next(error);
+	}
+});
+
+
+
+/*
 	path:    /user/delete
 	dscrip:  delete an user
 	body:    all params (body)
@@ -197,10 +222,41 @@ router.delete('/delete/:id', async (req, res, next) => {
 router.get('/oneUserMatches/:id', async (req, res, next) => {
 	const { id } = req.params;
 	try{
-		const user = await Users.findById(id);
+		const user = await Users.findById(id).populate('comunications');
 		if (user) {
-			const { match } = user
-			return res.json( { match } );
+			const { comunications } = user
+			let statusByIs = []
+			let allIds = comunications.map((com,index) => {
+				if(com.sender != req.session.currentUser._id)
+					return ( statusByIs.push({ id: com.sender, status: com.status}),
+						 mongoose.Types.ObjectId(com.sender) )
+				else 
+					return (statusByIs.push({ id: com.receiver, status: com.status}),
+							mongoose.Types.ObjectId(com.receiver))
+			})
+
+			const usersMathc = await Users.find({'_id': {$in: allIds }}).populate('comunications');
+			
+			let userWithStatus = [];
+
+			usersMathc.forEach((u,index1)=>{
+				statusByIs.forEach((c,index2) =>{
+					let user = {}
+					c.id == u._id
+					{
+						console.log('entra')
+						 user = {
+							id: u._id,
+							name: u.name,
+							surnames: u.surnames,
+							state:  c.status,
+							nativeLanguages: u.nativeLanguages
+						}
+					userWithStatus.push(user);
+				}})
+			});
+
+			return res.json(userWithStatus);
 		}
 		return res.status(404).json({ code: 'not-found' });
 	} catch(error) {
@@ -218,8 +274,8 @@ router.get('/:id', async (req, res, next) => {
 	try{
 		const user = await Users.findById(id);
 		if (user) {
-			const { _id, name, surnames, email, nativeLanguages, comunications, match } = user
-			return res.json( {_id, name, surnames, email, nativeLanguages, comunications, match } );
+			const { _id, name, surnames, email, nativeLanguages, comunications } = user
+			return res.json( {_id, name, surnames, email, nativeLanguages, comunications } );
 		}
 		return res.status(404).json({ code: 'not-found' });
 	} catch(error) {

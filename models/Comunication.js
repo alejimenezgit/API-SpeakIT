@@ -2,8 +2,9 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const comunicationSchema = new Schema({
-    language:  {type: String, required: true},
-    user:      {type: Array,  required: true}
+    sender:     {type: mongoose.Schema.Types.ObjectId, required: true},
+    receiver:   {type: mongoose.Schema.Types.ObjectId,  required: true},
+    status:     {type: String, required: true}
 });
 
 const Comunication = mongoose.model('Comunication', comunicationSchema);
