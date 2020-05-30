@@ -219,7 +219,7 @@ router.delete('/delete/:id', async (req, res, next) => {
 	dscrip:  get an user
 	body:    email, password
 */
-router.get('/oneUserMatches/:id', async (req, res, next) => {
+router.post('/oneUserMatches/:id', async (req, res, next) => {
 	const { id } = req.params;
 	try{
 		const user = await Users.findById(id).populate('comunications');
@@ -229,17 +229,40 @@ router.get('/oneUserMatches/:id', async (req, res, next) => {
 			console.log('comunications: ', comunications)
 			let statusByIs = []
 			let allIds = comunications.map((com,index) => {
-				console.log(com.status);
-				if(com.sender == req.session.currentUser._id && com.status != 'match')
-					return ( statusByIs.push({ id: com.sender, status: com.status, idCom: com._id }),
-						 mongoose.Types.ObjectId(com.sender) )
-				else 
-					if (com.status == 'match')
-						statusByIs.push({ id: com.receiver,status: 'match', idCom: com._id })
-					else
-						statusByIs.push({ id: com.receiver,status: 'addOrNot', idCom: com._id })
+				console.log(req.body, 'bodyyyyyyyyyyyyy');
+				console.log(com);
 
-					return mongoose.Types.ObjectId(com.receiver)
+				if(req.body.status === 'match'){
+
+					if(com.sender == req.session.currentUser._id){
+						console.log('1')
+						return (statusByIs.push({ id: com.sender, status: com.status, idCom: com._id }),
+						mongoose.Types.ObjectId(com.receiver) )
+					}
+					
+					else 
+						if (com.status === 'match') {
+							console.log('2')
+							statusByIs.push({ id: com.receiver,status: 'match', idCom: com._id }) }
+						else{
+							console.log('3')
+							statusByIs.push({ id: com.receiver,status: 'addOrNot', idCom: com._id })
+						}
+
+						return mongoose.Types.ObjectId(com.sender)
+				}
+				else if (req.body.status === 'done' && com.status === 'match') {
+					console.log('4')
+					if(com.sender === req.session.currentUser._id) {
+						statusByIs.push({ id: com.sender, status: 'done', idCom: com._id })
+						return mongoose.Types.ObjectId(com.receiver)
+					}
+					else {
+						statusByIs.push({ id: com.receiver,status: 'done', idCom: com._id })
+						return mongoose.Types.ObjectId(com.sender)
+					}
+						
+				}
 			})
 
 			const usersMathc = await Users.find({'_id': {$in: allIds }}).populate('comunications');
