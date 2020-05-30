@@ -222,72 +222,65 @@ router.delete('/delete/:id', async (req, res, next) => {
 router.post('/oneUserMatches/:id', async (req, res, next) => {
 	const { id } = req.params;
 	try{
-		const user = await Users.findById(id).populate('comunications');
+		let user = await Users.findById(id).populate('comunications');
 		if (user) {
-			const { comunications } = user
-			console.log('mi id', req.session.currentUser._id)
-			console.log('comunications: ', comunications)
+			let { comunications } = user;
 			let statusByIs = []
 			let allIds = comunications.map((com,index) => {
-				console.log(req.body, 'bodyyyyyyyyyyyyy');
-				console.log(com);
-
 				if(req.body.status === 'match' && com.status !== 'match'){
 
 					if(com.sender == req.session.currentUser._id){
-						console.log('1')
-						return (statusByIs.push({ id: com.sender, status: com.status, idCom: com._id }),
+						return (statusByIs.push({ id: com.receiver, status: com.status, idCom: com._id }),
 						mongoose.Types.ObjectId(com.receiver) )
 					}
 					
 					else 
 						if (com.status === 'match') {
-							console.log('2')
-							statusByIs.push({ id: com.receiver,status: 'match', idCom: com._id }) }
+							statusByIs.push({ id: com.sender,status: 'match', idCom: com._id }) }
 						else{
-							console.log('3')
-							statusByIs.push({ id: com.receiver,status: 'addOrNot', idCom: com._id })
+							statusByIs.push({ id: com.sender,status: 'addOrNot', idCom: com._id })
 						}
 
 						return mongoose.Types.ObjectId(com.sender)
 				}
 				else if (req.body.status === 'done' && com.status === 'match') {
-					console.log('4')
 					if(com.sender === req.session.currentUser._id) {
-						statusByIs.push({ id: com.sender, status: 'done', idCom: com._id })
+						statusByIs.push({ id: com.receiver, status: 'done', idCom: com._id })
 						return mongoose.Types.ObjectId(com.receiver)
 					}
 					else {
-						statusByIs.push({ id: com.receiver,status: 'done', idCom: com._id })
+						statusByIs.push({ id: com.sender,status: 'done', idCom: com._id })
 						return mongoose.Types.ObjectId(com.sender)
 					}
 						
 				}
 			})
 
-			const usersMathc = await Users.find({'_id': {$in: allIds }}).populate('comunications');
+			let usersMathc = await Users.find({'_id': {$in: allIds }}).populate('comunications');
 			
 			let userWithStatus = [];
+			let userWithStatus2 = [];
 
-			usersMathc.forEach((u,index1)=>{
-				statusByIs.forEach((c,index2) =>{
-					let user = {}
-					c.id == u._id
-					{
-						user = {
-							id: u._id,
-							name: u.name,
-							surnames: u.surnames,
-							state:  c.status,
-							nativeLanguages: u.nativeLanguages,
-							idCom: c.idCom
+
+			usersMathc.forEach(function(user) {
+				statusByIs.forEach(function(status){
+					let userID = user._id;
+					let statusID = status.id;
+					if(String(userID) ===  String(statusID)) {
+						console.log('entra',userWithStatus2);
+						let u  = {
+							id: user._id,
+							name: user.name,
+							surnames: user.surnames,
+							state: status.status,
+							nativeLanguages: user.nativeLanguages,
+							idCom: status.idCom
 						}
-						userWithStatus.push(user);
+						userWithStatus2.push(u);
 					}
 				})
-			});
-			console.log(statusByIs, usersMathc)
-			return res.json(userWithStatus);
+			})
+			return res.json(userWithStatus2);
 		}
 		return res.status(404).json({ code: 'not-found' });
 	} catch(error) {
