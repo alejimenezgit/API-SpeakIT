@@ -225,14 +225,21 @@ router.get('/oneUserMatches/:id', async (req, res, next) => {
 		const user = await Users.findById(id).populate('comunications');
 		if (user) {
 			const { comunications } = user
+			console.log('mi id', req.session.currentUser._id)
+			console.log('comunications: ', comunications)
 			let statusByIs = []
 			let allIds = comunications.map((com,index) => {
-				if(com.sender != req.session.currentUser._id)
-					return ( statusByIs.push({ id: com.sender, status: com.status}),
+				console.log(com.status);
+				if(com.sender == req.session.currentUser._id && com.status != 'match')
+					return ( statusByIs.push({ id: com.sender, status: com.status, idCom: com._id }),
 						 mongoose.Types.ObjectId(com.sender) )
 				else 
-					return (statusByIs.push({ id: com.receiver, status: com.status}),
-							mongoose.Types.ObjectId(com.receiver))
+					if (com.status == 'match')
+						statusByIs.push({ id: com.receiver,status: 'match', idCom: com._id })
+					else
+						statusByIs.push({ id: com.receiver,status: 'addOrNot', idCom: com._id })
+
+					return mongoose.Types.ObjectId(com.receiver)
 			})
 
 			const usersMathc = await Users.find({'_id': {$in: allIds }}).populate('comunications');
@@ -244,16 +251,17 @@ router.get('/oneUserMatches/:id', async (req, res, next) => {
 					let user = {}
 					c.id == u._id
 					{
-						console.log('entra')
-						 user = {
+						user = {
 							id: u._id,
 							name: u.name,
 							surnames: u.surnames,
 							state:  c.status,
-							nativeLanguages: u.nativeLanguages
+							nativeLanguages: u.nativeLanguages,
+							idCom: c.idCom
 						}
-					userWithStatus.push(user);
-				}})
+						userWithStatus.push(user);
+					}
+				})
 			});
 
 			return res.json(userWithStatus);
