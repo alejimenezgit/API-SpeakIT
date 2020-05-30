@@ -232,7 +232,7 @@ router.post('/oneUserMatches/:id', async (req, res, next) => {
 				console.log(req.body, 'bodyyyyyyyyyyyyy');
 				console.log(com);
 
-				if(req.body.status === 'match'){
+				if(req.body.status === 'match' && com.status !== 'match'){
 
 					if(com.sender == req.session.currentUser._id){
 						console.log('1')
@@ -286,7 +286,7 @@ router.post('/oneUserMatches/:id', async (req, res, next) => {
 					}
 				})
 			});
-
+			console.log(statusByIs, usersMathc)
 			return res.json(userWithStatus);
 		}
 		return res.status(404).json({ code: 'not-found' });

@@ -23,18 +23,20 @@ mongoose
 	.catch(error => {
 		console.error(error);
 	});
+	
+const app = express();
 
+app.use(cors( {
+	origin: [process.env.FRONTEND_DOMAIN],
+	credentials: true
+	}	
+));
+	
 const userRouter = require('./routes/user');
 const languageRouter = require('./routes/language');
 const comunicationRouter = require('./routes/comunication');
 
-const app = express();
 
-app.use(cors( {
-	credentials: true,
-	origin: [process.env.FRONTEND_DOMAIN],
-	}	
-));
 
 app.use(cookieParser());
 
