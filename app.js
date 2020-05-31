@@ -6,6 +6,8 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
+const http = require('http').createServer(express);
+const io = require('socket.io')();
 const cors = require('cors');
 require('dotenv').config();
 
@@ -36,6 +38,18 @@ const userRouter = require('./routes/user');
 const languageRouter = require('./routes/language');
 const comunicationRouter = require('./routes/comunication');
 
+app.get('/',function(req, res){
+	res.send('<h1> Hello word </h1>');
+});
+
+
+io.on('connection', function(socket){
+	console.log(' a user connected')
+})
+
+http.listen(3002, function(){
+	console.log('listening on *:3002')
+})
 
 
 app.use(cookieParser());
