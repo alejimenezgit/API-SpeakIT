@@ -230,26 +230,29 @@ router.post('/oneUserMatches/:id', async (req, res, next) => {
 				if(req.body.status === 'match' && com.status !== 'match'){
 
 					if(com.sender == req.session.currentUser._id){
-						return (statusByIs.push({ id: com.receiver, status: com.status, idCom: com._id }),
+						return (statusByIs.push({ id: com.receiver, status: com.status, idCom: com._id, chat: com.chat }),
 						mongoose.Types.ObjectId(com.receiver) )
 					}
 					
 					else 
 						if (com.status === 'match') {
-							statusByIs.push({ id: com.sender,status: 'match', idCom: com._id }) }
+							statusByIs.push({ id: com.sender,status: 'match', idCom: com._id, chat: com.chat }) }
 						else{
-							statusByIs.push({ id: com.sender,status: 'addOrNot', idCom: com._id })
+							statusByIs.push({ id: com.sender,status: 'addOrNot', idCom: com._id, chat: com.chat })
 						}
 
 						return mongoose.Types.ObjectId(com.sender)
 				}
 				else if (req.body.status === 'done' && com.status === 'match') {
-					if(com.sender === req.session.currentUser._id) {
-						statusByIs.push({ id: com.receiver, status: 'done', idCom: com._id })
+					console.log('entra..--------------------------- 1 ', com.sender, req.session.currentUser._id)
+					if(String(com.sender) === String(req.session.currentUser._id)) {
+						console.log('entra..--------------------------- 2', com.sender, req.session.currentUser._id)
+						statusByIs.push({ id: com.receiver, status: 'done', idCom: com._id, chat: com.chat })
 						return mongoose.Types.ObjectId(com.receiver)
 					}
 					else {
-						statusByIs.push({ id: com.sender,status: 'done', idCom: com._id })
+						console.log('entra..--------------------------- 3', com.sender, req.session.currentUser._id)
+						statusByIs.push({ id: com.sender,status: 'done', idCom: com._id, chat: com.chat })
 						return mongoose.Types.ObjectId(com.sender)
 					}
 						
@@ -259,28 +262,27 @@ router.post('/oneUserMatches/:id', async (req, res, next) => {
 			let usersMathc = await Users.find({'_id': {$in: allIds }}).populate('comunications');
 			
 			let userWithStatus = [];
-			let userWithStatus2 = [];
-
 
 			usersMathc.forEach(function(user) {
 				statusByIs.forEach(function(status){
 					let userID = user._id;
 					let statusID = status.id;
 					if(String(userID) ===  String(statusID)) {
-						console.log('entra',userWithStatus2);
 						let u  = {
 							id: user._id,
 							name: user.name,
 							surnames: user.surnames,
 							state: status.status,
 							nativeLanguages: user.nativeLanguages,
-							idCom: status.idCom
+							idCom: status.idCom,
+							chat: status.chat
 						}
-						userWithStatus2.push(u);
+						userWithStatus.push(u);
 					}
 				})
-			})
-			return res.json(userWithStatus2);
+			});
+			console.log(userWithStatus);
+			return res.json(userWithStatus);
 		}
 		return res.status(404).json({ code: 'not-found' });
 	} catch(error) {
