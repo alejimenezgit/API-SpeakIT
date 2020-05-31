@@ -6,8 +6,11 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
-const http = require('http').createServer(express);
-const io = require('socket.io')();
+
+const app1 = require('express')();
+const http = require('http').createServer(app1);
+const io = require('socket.io').listen(http);
+
 const cors = require('cors');
 require('dotenv').config();
 
@@ -28,6 +31,12 @@ mongoose
 	
 const app = express();
 
+app1.use(cors( {
+	origin: [process.env.FRONTEND_DOMAIN],
+	credentials: true
+	}	
+));
+	
 app.use(cors( {
 	origin: [process.env.FRONTEND_DOMAIN],
 	credentials: true
@@ -38,10 +47,9 @@ const userRouter = require('./routes/user');
 const languageRouter = require('./routes/language');
 const comunicationRouter = require('./routes/comunication');
 
-app.get('/',function(req, res){
+app.get('/mainpage',function(req, res){
 	res.send('<h1> Hello word </h1>');
 });
-
 
 io.on('connection', function(socket){
 	console.log(' a user connected')
