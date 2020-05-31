@@ -7,8 +7,8 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 
-const app1 = require('express')();
-const http = require('http').createServer(app1);
+const appSocket = require('express')();
+const http = require('http').createServer(appSocket);
 const io = require('socket.io').listen(http);
 
 const cors = require('cors');
@@ -31,7 +31,7 @@ mongoose
 	
 const app = express();
 
-app1.use(cors( {
+appSocket.use(cors( {
 	origin: [process.env.FRONTEND_DOMAIN],
 	credentials: true
 	}	
@@ -47,12 +47,12 @@ const userRouter = require('./routes/user');
 const languageRouter = require('./routes/language');
 const comunicationRouter = require('./routes/comunication');
 
-app.get('/mainpage',function(req, res){
-	res.send('<h1> Hello word </h1>');
-});
-
 io.on('connection', function(socket){
-	console.log(' a user connected')
+	console.log(' a user connected');
+	socket.on('chat message', function(msg){
+		console.log('message' + JSON.stringify(msg));
+		io.emit('chat message', msg);
+	})
 })
 
 http.listen(3002, function(){
