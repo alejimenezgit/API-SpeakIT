@@ -36,6 +36,26 @@ router.post('/add',  async (req, res, next) => {
 	}
 });
 
+
+/*
+	path:    /language/add
+	dscrip:  add an language
+	body:    all params (body)
+*/
+router.post('/allById',  async (req, res, next) => {
+	try{
+		const allLanguages = await Language.find({'_id': {$in: req.body }})
+		console.log(allLanguages)
+		if (allLanguages) {
+			return res.json(allLanguages);
+		}
+		return res.status(404).json({ code: 'not-found' });
+	} catch(error) {
+		next(error);
+	}
+});
+
+
 /*
 	path:    /language/update
 	dscrip:  update an language
