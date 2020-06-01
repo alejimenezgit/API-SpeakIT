@@ -227,7 +227,7 @@ router.post('/oneUserMatches/:id', async (req, res, next) => {
 			let { comunications } = user;
 			let statusByIs = []
 			let allIds = comunications.map((com,index) => {
-				if(req.body.status === 'match' && com.status !== 'match'){
+				if(req.body.status === 'match' && com.status !== 'match' && com.status !== 'delete'){
 
 					if(com.sender == req.session.currentUser._id){
 						return (statusByIs.push({ id: com.receiver, status: com.status, idCom: com._id, chat: com.chat }),
