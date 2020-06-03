@@ -76,6 +76,20 @@ router.put('/update/:id', async (req, res, next) => {
 	}
 });
 
+router.put('/pushComunication/:id', async (req, res, next) => {
+	const { id } = req.params;
+	console.log(id, req.body, '------------------------------------------------------------------------')
+	try{
+		const comunication = await Comunication.findByIdAndUpdate(id,{$push: {chat: req.body}});
+		if (comunication) {
+			return res.json("done");
+		}
+		return res.status(404).json({ code: 'not-found' });
+	} catch(error) {
+		next(error);
+	}
+});
+
 /*
 	path:    /comunication/delete
 	dscrip:  delete an comunication

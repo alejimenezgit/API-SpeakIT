@@ -31,22 +31,16 @@ mongoose
 	
 const app = express();
 
-appSocket.use(cors( 
-  {
-		'origin': '*',
-		'methods': 'GET,HEAD,PUT,PATCH,POST,DELETE',
-		'preflightContinue': false,
-		'optionsSuccessStatus': 204
-  }
+appSocket.use(cors( {
+	origin: [process.env.FRONTEND_DOMAIN],
+	credentials: true
+	}	
 ));
 	
-app.use(cors( 
-	{
-		'origin':'*',
-		'methods': 'GET,HEAD,PUT,PATCH,POST,DELETE',
-		'preflightContinue': false,
-		'optionsSuccessStatus': 204
-	}
+app.use(cors( {
+	origin: [process.env.FRONTEND_DOMAIN],
+	credentials: true
+	}	
 ));
 	
 const userRouter = require('./routes/user');
