@@ -9,10 +9,7 @@ const bcryptSalt = 10;
 
 // checkIfLoggedIn
 
-/*
-	path:    /user/logout
-	dscrip:  disconnect the user session
-*/
+
 router.get('/logout', (req, res, next) => {
 	req.session.destroy(err => {
 		if (err) {
@@ -22,24 +19,16 @@ router.get('/logout', (req, res, next) => {
 	});
 });
 
-/*
-	path:    /user/whouseris
-	dscrip:  if user is connected
-*/
+
 router.get('/whouseris', (req, res, next) => {
 	if (req.session.currentUser) {
 		const { _id, name, surnames, email, nativeLanguages, comunications } = req.session.currentUser;
-		console.log(req.session.currentUser)
 		res.status(200).json({ _id, name, surnames, email, nativeLanguages, comunications } );
 	} else {
 		res.status(401).json({ code: 'unauthorized' });
 	}
 });
 
-/*
-	path:    /user/random
-	dscrip:  get a random user
-*/
 router.get('/random',  async (req, res, next) => {
 	try{
 		const users = await Users.find();
@@ -52,11 +41,6 @@ router.get('/random',  async (req, res, next) => {
 		next(error);
 	}
 });
-
-/*
-	path:    /user/all
-	dscrip:  get an user
-*/
 
 router.post('/allbyLanguage',  async (req, res, next) => {
 	console.log(req.body)
@@ -72,11 +56,6 @@ router.post('/allbyLanguage',  async (req, res, next) => {
 	}
 });
 
-/*
-	path:    /user/all
-	dscrip:  get an user
-*/
-
 router.get('/all',  async (req, res, next) => {
 	try{
 		const user = await Users.find();
@@ -89,14 +68,6 @@ router.get('/all',  async (req, res, next) => {
 	}
 });
 
-
-
-
-/*
-	path:    /user/add
-	dscrip:  add an user
-	body:    all params (body)
-*/
 router.post('/add', async (req, res, next) => {
 	const { name, surnames, email, password, nativeLanguages, comunications } = req.body;
 	const newUser = new Users(req.body);
@@ -120,11 +91,7 @@ router.post('/add', async (req, res, next) => {
 	}
 });
 
-/*
-	path:    /user/pushMash
-	dscrip:  update an user
-	body:    all params (body)
-*/
+
 router.put('/pushMatch/:id', async (req, res, next) => {
 	const { id } = req.params;
 	try{
@@ -137,12 +104,7 @@ router.put('/pushMatch/:id', async (req, res, next) => {
 		next(error);
 	}
 });
- 
-/*
-	path:    /user/pushComunication
-	dscrip:  update an user
-	body:    all params (body)
-*/
+
 router.put('/pushComunication/:id', async (req, res, next) => {
 	const { id } = req.params;
 	try{
@@ -156,11 +118,6 @@ router.put('/pushComunication/:id', async (req, res, next) => {
 	}
 });
 
-/*
-	path:    /user/update
-	dscrip:  update an user
-	body:    all params (body)
-*/
 router.put('/update/:id', async (req, res, next) => {
 	const { id } = req.params;
 	try{
@@ -174,11 +131,6 @@ router.put('/update/:id', async (req, res, next) => {
 	}
 });
 
-/*
-	path:    /user/createMatch
-	dscrip:  update an user
-	body:    all params (body)
-*/
 router.post('/createMatch', async (req, res, next) => {
 	const comunication = new Comunication(req.body);
 	try{
@@ -195,13 +147,6 @@ router.post('/createMatch', async (req, res, next) => {
 	}
 });
 
-
-
-/*
-	path:    /user/delete
-	dscrip:  delete an user
-	body:    all params (body)
-*/
 router.delete('/delete/:id', async (req, res, next) => {
 	try{
 		const user = await Users.findByIdAndRemove(req.params.id);
@@ -214,11 +159,7 @@ router.delete('/delete/:id', async (req, res, next) => {
 	}
 });
 
-/*
-	path:    /user/
-	dscrip:  get an user
-	body:    email, password
-*/
+
 router.post('/oneUserMatches/:id', async (req, res, next) => {
 	const { id } = req.params;
 	try{
@@ -244,18 +185,14 @@ router.post('/oneUserMatches/:id', async (req, res, next) => {
 						return mongoose.Types.ObjectId(com.sender)
 				}
 				else if (req.body.status === 'done' && com.status === 'match') {
-					console.log('entra..--------------------------- 1 ', com.sender, req.session.currentUser._id)
 					if(String(com.sender) === String(req.session.currentUser._id)) {
-						console.log('entra..--------------------------- 2', com.sender, req.session.currentUser._id)
 						statusByIs.push({ id: com.receiver, status: 'done', idCom: com._id, chat: com.chat })
 						return mongoose.Types.ObjectId(com.receiver)
 					}
 					else {
-						console.log('entra..--------------------------- 3', com.sender, req.session.currentUser._id)
 						statusByIs.push({ id: com.sender,status: 'done', idCom: com._id, chat: com.chat })
 						return mongoose.Types.ObjectId(com.sender)
 					}
-						
 				}
 			})
 
@@ -281,7 +218,6 @@ router.post('/oneUserMatches/:id', async (req, res, next) => {
 					}
 				})
 			});
-			console.log(userWithStatus);
 			return res.json(userWithStatus);
 		}
 		return res.status(404).json({ code: 'not-found' });
@@ -290,11 +226,6 @@ router.post('/oneUserMatches/:id', async (req, res, next) => {
 	}
 });
 
-/*
-	path:    /user/
-	dscrip:  get an user
-	body:    email, password
-*/
 router.get('/:id', async (req, res, next) => {
 	const { id } = req.params;
 	try{
@@ -309,11 +240,6 @@ router.get('/:id', async (req, res, next) => {
 	}
 });
 
-/*
-	path:    /user/
-	dscrip:  get an user
-	body:    email, password
-*/
 router.post('/', checkUserEmpty, async (req, res, next) => {
 	const { email,password } = res.locals.auth;
 	try{

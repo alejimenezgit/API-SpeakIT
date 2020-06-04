@@ -32,13 +32,13 @@ mongoose
 const app = express();
 
 appSocket.use(cors( {
-	origin: [process.env.FRONTEND_DOMAIN],
+	origin: "*",
 	credentials: true
 	}	
 ));
 	
 app.use(cors( {
-	origin: [process.env.FRONTEND_DOMAIN],
+	origin: "*",
 	credentials: true
 	}	
 ));

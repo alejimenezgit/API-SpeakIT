@@ -1,12 +1,9 @@
-const express = require('express');
-const router  = express.Router();
-const Comunication   = require('../models/Comunication');
-const Users   = require('../models/User');
+const express 			= require('express');
+const router  			= express.Router();
+const Comunication   	= require('../models/Comunication');
+const Users   			= require('../models/User');
 
-/*
-	path:    /comunication/all
-	dscrip:  get all the comunication
-*/
+
 router.get('/all', async (req, res, next) => {
 	try{
 		const comunication = await Comunication.find();
@@ -19,11 +16,7 @@ router.get('/all', async (req, res, next) => {
 	}
 });
 
-/*
-	path:    /comunication/add
-	dscrip:  add an comunication
-	body:    all params (body)
-*/
+
 router.post('/add',  async (req, res, next) => {
 	const comunication = new Comunication(req.body);
 	try{
@@ -37,11 +30,7 @@ router.post('/add',  async (req, res, next) => {
 	}
 });
 
-/*
-	path:    /comunication/allByIds
-	dscrip:  get all Comunications by User
-	body:    all params (body)
-*/
+
 router.get('/allByIds/:id', async (req, res, next) => {
 	try{
 		const comunication = await Users.findById(req.params.id).populate('comunications');
@@ -57,17 +46,12 @@ router.get('/allByIds/:id', async (req, res, next) => {
 	}
 });
 
-/*
-	path:    /comunication/update
-	dscrip:  update an comunication
-	body:    all params (body)
-*/
+
 router.put('/update/:id', async (req, res, next) => {
 	const { id } = req.params;
 	try{
 		const comunication = await Comunication.findByIdAndUpdate(id,req.body);
 		if (comunication) {
-			/*const userUpdated = await Users.findOne({ email })*/
 			return res.json("done");
 		}
 		return res.status(404).json({ code: 'not-found' });
@@ -90,11 +74,6 @@ router.put('/pushComunication/:id', async (req, res, next) => {
 	}
 });
 
-/*
-	path:    /comunication/delete
-	dscrip:  delete an comunication
-	body:    all params (body)
-*/
 router.delete('/delete/:id', async (req, res, next) => {
 	try{
 		const comunication = await Comunication.findByIdAndRemove(req.params.id);
@@ -107,11 +86,6 @@ router.delete('/delete/:id', async (req, res, next) => {
 	}
 });
 
-/*
-	path:    /comunication/
-	dscrip:  get an comunication
-	body:    language
-*/
 router.get('/:id', async (req, res, next) => {
 	const { id } = req.params;
 	try{

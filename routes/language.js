@@ -2,10 +2,7 @@ const express  = require('express');
 const router   = express.Router();
 const Language = require('../models/Language');
 
-/*
-	path:    /language/all
-	dscrip:  get all the language
-*/
+
 router.get('/all', async (req, res, next) => {
 	try{
 		const languages = await Language.find();
@@ -18,11 +15,6 @@ router.get('/all', async (req, res, next) => {
 	}
 });
 
-/*
-	path:    /language/add
-	dscrip:  add an language
-	body:    all params (body)
-*/
 router.post('/add',  async (req, res, next) => {
 	const languages = new Language(req.body);
 	try{
@@ -36,12 +28,6 @@ router.post('/add',  async (req, res, next) => {
 	}
 });
 
-
-/*
-	path:    /language/add
-	dscrip:  add an language
-	body:    all params (body)
-*/
 router.post('/allById',  async (req, res, next) => {
 	try{
 		const allLanguages = await Language.find({'_id': {$in: req.body }})
@@ -55,12 +41,6 @@ router.post('/allById',  async (req, res, next) => {
 	}
 });
 
-
-/*
-	path:    /language/update
-	dscrip:  update an language
-	body:    all params (body)
-*/
 router.put('/update/:id', async (req, res, next) => {
 	const { id } = req.params;
 	try{
@@ -75,11 +55,6 @@ router.put('/update/:id', async (req, res, next) => {
 	}
 });
 
-/*
-	path:    /language/delete
-	dscrip:  delete an language
-	body:    all params (body)
-*/
 router.delete('/delete/:id', async (req, res, next) => {
 	try{
 		const language = await Language.findByIdAndRemove(req.params.id);
@@ -92,11 +67,7 @@ router.delete('/delete/:id', async (req, res, next) => {
 	}
 });
 
-/*
-	path:    /language/
-	dscrip:  get an language
-	body:    language
-*/
+
 router.get('/:id', async (req, res, next) => {
 	const { id } = req.params;
 	try{
