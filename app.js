@@ -33,14 +33,12 @@ const app = express();
 
 appSocket.use(cors( {
 	origin: process.env.FRONTEND_DOMAIN,
-	optionsSuccessStatus: 200,
 	credentials: true
 	}	
 ));
 	
 app.use(cors( {
 	origin: process.env.FRONTEND_DOMAIN,
-	optionsSuccessStatus: 200,
 	credentials: true
 	}	
 ));
@@ -68,7 +66,7 @@ app.use(
 	session({
 		store: new MongoStore({
 			mongooseConnection: mongoose.connection,
-			ttl: 24 * 60 * 60, // 1 day
+			ttl: 24 * 60 * 60, 
 		}),
 		secret: process.env.SECRET_SESSION,
 		resave: true,
