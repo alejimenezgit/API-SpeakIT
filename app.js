@@ -33,12 +33,14 @@ const app = express();
 
 appSocket.use(cors( {
 	origin: process.env.FRONTEND_DOMAIN,
+	optionsSuccessStatus: 200,
 	credentials: true
 	}	
 ));
 	
 app.use(cors( {
 	origin: process.env.FRONTEND_DOMAIN,
+	optionsSuccessStatus: 200,
 	credentials: true
 	}	
 ));
